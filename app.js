@@ -1,11 +1,14 @@
 const express = require('express');
+const { mongoDB } = require('./helpers/DBconnection');
 const app = express();
+require('dotenv').config()
 app.use(express.json());
-const port = 3001;
-
+mongoDB();
 app.get('/', function (req, res) {
   res.send('welcome to resturent backen');
 });
 
-app.listen(port);
-console.log(port);
+app.listen(process.env.PORT,()=>{
+    console.log(`listining on Port ${process.env.PORT}`);
+});
+
