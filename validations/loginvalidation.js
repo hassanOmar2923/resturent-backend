@@ -1,16 +1,13 @@
 // const Joi = require("joi");
 const joi = require('joi');
 // validation usermodel
-function Uservalidtion(userobj) {
+function loginvalidtion(userobj) {
   let userval = joi.object({
-    FullName: joi.string().required(),
     UserName: joi.string().required(),
     password: joi.string().required(),
-    Role: joi.string().required(),
-    status: joi.string().required(),
   });
   return userval.validate(userobj);
 }
 module.exports = {
-  Uservalidtion,
+  loginvalidtion,
 };
