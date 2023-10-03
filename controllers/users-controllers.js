@@ -1,102 +1,110 @@
-const { usermodel } = require('../models/users-model');
-const { loginvalidtion } = require('../validations/loginvalidation');
-const { Uservalidtion } = require('../validations/users-validations');
-let bcrypt = require('bcrypt');
-const daysjs = require('dayjs');
-const jwt = require('jsonwebtoken');
-const UserGet = async (req, res) => {
+const { usersModel } = require("../models/users-model");
+const { usersValidation } = require("../validations/users-validations");
+const bcrypt=require('bcrypt')
+//get data
+const get = async (req, res) => {
   try {
-    const userget = await usermodel.find();
-    res.status(200).send(userget);
+    const userData = await usersModel.find();
+    res.status(200).send(userData);
   } catch (error) {
-    res.status(404).send(error.message);
+    res.status(400).send(error.message);
   }
 };
-// get by id
-const UserGetById = async (req, res) => {
-  try {
-    let { id } = req.params;
-    const getdata = await usermodel.findById(id);
-    if (!getdata) return res.status(404).send('this user not found');
-    res.status(200).send(getdata);
-  } catch (error) {
-    res.status(404).send(error.message);
-  }
-};
-// Singup
-const Singup = async (req, res) => {
-  try {
-    // validation
-    const { error } = Uservalidtion(req.body);
-    if (error) return res.send(error.message);
-
-    const existuser = await usermodel.findOne({ UserName: req.body.UserName });
-    if (existuser)
-      return res
-        .status(400)
-        .send({ message: 'User already exists please login !' });
-    const userdata = await usermodel(req.body);
-    // Hash Password
-    const salt = await bcrypt.genSalt(10);
-    userdata.password = await bcrypt.hash(userdata.password, salt);
-    //save data
-    await userdata.save();
-    res.status(200).send({
-      status: true,
-      message: 'successfully saved singup',
-    });
-  } catch (error) {
-    res.status(404).send(error.message);
-  }
-};
-//login
-const LOGIN = async (req, res, next) => {
-  try {
-    // input validation from request
-    let { error } = loginvalidtion(req.body);
-    if (error) return res.send(error.message);
-    // check email user
-    const usergetdata = await usermodel.findOne({
-      UserName: req.body.UserName,
-    });
-    if (!usergetdata)
-      return res.send({ status: false, message: 'invalid email or password' });
-    // check password
-    let checkpas = await bcrypt.compare(
-      req.body.password,
-      usergetdata.password
-    );
-    if (!checkpas)
-      return res.send({ status: false, message: 'invalid email or password' });
-    // check the user active or pending
-    if (usergetdata.status === 'pending') {
-      return res.send({
-        message:
-          'sorry , This User Has Been Banned please contact the administrator ',
-      });
+//getById
+const getaById = async (req, res) => {
+    try {
+      const {id}=req.params
+      const PersonaldData = await usersModel.findById(id);
+      res.status(200).send(PersonaldData);
+    } catch (error) {
+      res.status(400).send(error.message);
     }
-    // expiretoken
-    const current = daysjs();
-    const TokenExpiration = current.add(1, 'hours');
-    // return console.log('TokenExpiration', TokenExpiration);
-    // token and expiration
-    let token = jwt.sign(
-      {
-        id: usergetdata._id,
-        name: usergetdata.name,
-        tokenExpireDate: TokenExpiration,
-      },
-      'ResturentKey'
-    );
-
-    res.send({ status: true, message: 'succefully login', token });
+  };
+//post data
+const Post = async (req, res) => {
+  try {
+    //validation
+    const { error } = usersValidation(req.body);
+    if (error) return res.status(405).send(error.message);
+    //post data
+    const postData = new usersModel(req.body);
+    postData.password=await bcrypt.hash(postData.password,10)
+    //if user is already exit
+    const allUsers=await usersModel.find({email:req.body.email})
+    if(allUsers.length>0) return res.status(409).send({status:false,message:'this user allready exit'})
+    //save post data
+    await postData.save();
+    res.status(201).send({
+        status:true,
+        message:'successfuly inserted',
+        data:postData
+    });
   } catch (error) {
-    console.log(error.message);
+    res.status(400).send(error.message);
   }
 };
-module.exports = {
-  UserGet,
-  UserGetById,
-  Singup,
-  LOGIN,
-};
+//put
+const Put = async (req, res) => {
+    try {
+      const {id}=req.params
+    //validation
+    const { error } = usersValidation(req.body);
+      if (error) return res.send(error.message);
+       //if user is already exit
+       const allUsers=await usersModel.find({email:req.body.email})
+    if(!allUsers) return res.status(409).send({status:false,message:'this user is not exit'})
+    //put data
+    req.body.password=await bcrypt.hash(req.body.password,10)
+    const putdate =await usersModel.findByIdAndUpdate(id,req.body,{new:true});
+      res.status(200).send({
+        status:true,
+        message:'successfuly Updated',
+        data:putdate
+
+    });
+     
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+  };
+
+  const updateStatus = async (req, res) => {
+    try {
+      const {id}=req.params
+    
+    
+      
+    //put data
+
+    const putdate =await usersModel.findByIdAndUpdate(id,{status:req.body.status},{new:true});
+      res.status(200).send({
+        status:true,
+        message:'successfuly Updated',
+        data:putdate
+
+    });
+     
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+  };
+  //dalete specific databyId
+  const Delete=async(req,res)=>{
+    try {
+      const {id}=req.params
+        //delete specific databyId
+        const deletedata=await usersModel.findByIdAndDelete(id)
+        res.status(200).send({
+            status:true,
+            message:'successfuly deleted',
+            data:deletedata
+
+     
+        });
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+   
+
+  }
+module.exports = { get, Post,updateStatus ,Put,getaById,Delete};

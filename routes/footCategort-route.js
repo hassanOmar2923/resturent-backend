@@ -8,6 +8,6 @@ route.get('',getAll)
 route.get('/:id',getById)
 route.post('/',Post)
 route.put('/',Put)
-route.delete('/',Delete)
+route.delete('/:id',Delete)
 
 module.exports=route

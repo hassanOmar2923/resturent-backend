@@ -1,6 +1,6 @@
 const joi = require("joi");
 
-function orderValidation(body){
+function cartValidation(body){
     const val=joi.object({
         
 
@@ -9,8 +9,9 @@ function orderValidation(body){
         totalAmount:joi.number().required(),
         price:joi.number().required(),
         food:joi.string().required(),
+        name:joi.string(),
     })
     return val.validate(body)
 }
 
-module.exports ={orderValidation}
+module.exports ={cartValidation}
