@@ -1,16 +1,16 @@
-const express = require('express');
-const {
-  UserGet,
-  UserGetById,
-  Singup,
-  LOGIN,
-} = require('../controllers/users-controllers');
-const Authotications = require('../middlewares/Auth');
+const express=require('express')
+const route=express.Router()
+const { get, Post ,updateStatus,Put,getaById,Delete}=require('../controllers/users-controllers')
+//get user data
+route.get('/',get)
+route.get('/:id',getaById)
+//post
+route.post('/',Post)
+//put
+route.put('/:id',Put)
+route.put('/status/:id',updateStatus)
+//delete
+route.delete('/:id',Delete)
 
-const router = express.Router();
 
-router.get('/', Authotications, UserGet);
-router.get('/:id', UserGetById);
-router.post('/singup', Singup);
-router.post('/login', LOGIN);
-module.exports = router;
+module.exports = route

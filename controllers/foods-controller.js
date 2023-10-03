@@ -36,7 +36,7 @@ const Post=async(req,res)=>{
             status:true,
             message:'created!!',
             postData
-           
+        
            
         })
 

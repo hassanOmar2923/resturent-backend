@@ -1,37 +1,27 @@
-let jwt = require('jsonwebtoken');
-const { usermodel } = require('../models/users-model');
-const dayjs = require('dayjs');
+const { usersModel } = require("../models/users-model");
 
-const Authotications = async (req, res, next) => {
-  const header = req.headers['authorization'];
-  if (!header) return res.send('sorry not authorized');
-  const token = header.split(' ')[1];
+const jwt=require('jsonwebtoken')
 
-  try {
-    const Decoded = jwt.verify(token, 'ResturentKey');
-    // console.log(Decoded);
-    const { tokenExpireDate } = Decoded;
-    let todays = dayjs();
-    let tokendate = dayjs(tokenExpireDate);
-    remendidsecondToken = tokendate.diff(todays, 'seconds');
-    // console.log('remendidsecondToken', remendidsecondToken);
-    if (remendidsecondToken < 0)
-      return res
-        .status(403)
-        .send({ message: 'tokenExpired please logout!  then login ' });
+require('dotenv').config()
+const Authentication =(AuthirzedUsers)=>{
+    return async(req,res,next)=>{
+        try {
+            let Token=req.headers['authorization']
+        if(!Token) return res.status(401).send({status:false,message:'no access token provided'})
+        let token=Token.split(' ')[1]
+        let tokenVerify=jwt.verify(token,process.env.token)
+        if(!tokenVerify) return res.status(401).send({status:false,message:'fake token'})
+   
+        const isValidUser=await usersModel.findById(tokenVerify.id)
+        if(!isValidUser) return res.status(401).send({status:false,message:'invalid user'})
+        if(isValidUser.status !== 'active') return res.status(401).send({status:false,message:'inactive user,please contact administrator'})
+        // if(!AuthirzedUsers.includes(isValidUser.role)) return res.status(401).send({status:false,message:'u have no permisions to this route'})
+        next()
+        } catch (error) {
+            res.status(401).send({status:false,message:"un-Authrized"})
+        }
+        
 
-    const userdata = await usermodel.findById(Decoded.id);
-    if (!userdata) return res.status(404).send('user not found');
-    // console.log(userdata);
-    if (userdata.status == 'pending')
-      return res.status(403).send({
-        message:
-          'sorry , This User Has Been Banned please contact the administrator ',
-      });
-
-    next();
-  } catch (error) {
-    res.status(401).send(error.message);
-  }
-};
-module.exports = Authotications;
+    }
+}
+module.exports ={Authentication}
