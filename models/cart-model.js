@@ -30,7 +30,12 @@ orderId:{
     type:String,
     // required:true
     default:""
-}
+},
+Date:{
+    type: String,
+    // default:Date.now()
+},
+
 },{timestamps:true})
 
 const cartModel=mongoose.model('cart',schema)

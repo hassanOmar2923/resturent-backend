@@ -16,10 +16,16 @@ price:{
     type:Number,
     required:true
 },
-img:{
-    type:String,
-    required:false,
-    default:'.png'
+image: {
+    public_id: {
+        type: String,
+        required: true
+    },
+    url: {
+        type: String,
+        required: true
+    }
+
 },
 status:{
     type:String,

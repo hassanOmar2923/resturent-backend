@@ -40,17 +40,19 @@ const getById = async (req, res) => {
 const Post = async (req, res) => {
   try {
     const {error}=cartValidation(req.body)
-    if(error) res.status(400).send(error.message)
+    if(error) return res.status(400).send(error.message)
     let data = req.body;
 const postData= new cartModel(data)
-await postData.save()
+await postData.save().then(()=>{
+  res.status(201).send({
+    status: true,
+    message: "added to the cart!!",
+  
+  });
+})
 
 
-res.status(201).send({
-  status: true,
-  message: "added to the cart!!",
 
-});
  
   
 

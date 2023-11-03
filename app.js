@@ -16,16 +16,22 @@ const Dailyreport=require('./routes/DailyOrderReport-route')
 const cartRoute=require('./routes/cart-route')
 const loginRoute=require('./routes/login-route')
 const userRoute=require('./routes/users-route');
+const customerRoute=require('./routes/customer-route');
+const custTransectionRoute=require('./routes/custTransection-route');
+const custPaymentRoute=require('./routes/cust-payment-route');
 const { Authentication } = require('./middlewares/Auth');
 app.use(express.json());
 app.use(cors());
 require('dotenv').config()
 mongoDB();
+
 app.get('/', function (req, res) {
   res.send('EndPoint');
 });
 app.use('/login',loginRoute)
-app.use(Authentication())
+app.use('/users',userRoute)
+
+// app.use(Authentication())
 app.use('/DailyOrderReport',Dailyreport)
 app.use('/cart',cartRoute)
 
@@ -37,7 +43,9 @@ app.use('/foods',foodRoute)
 app.use('/order',orderRoute)
 app.use('/orderReport',orderReport)
 app.use('/foodCat',foodCategoryRoute)
-app.use('/users',userRoute)
+app.use('/customers',customerRoute)
+app.use('/custTransection',custTransectionRoute)
+app.use('/custPayment',custPaymentRoute)
 app.listen(process.env.PORT,()=>{
     console.log(`listining on Port ${process.env.PORT}`);
 });

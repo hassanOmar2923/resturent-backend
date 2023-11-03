@@ -1,16 +1,16 @@
-const { cartModel } = require("../models/cart-model");
 const db = require("mongoose");
-const { foodCategoryModel } = require("../models/foodCategory-model");
-const { foodModel } = require("../models/foods-model");
-const { orderModel } = require("../models/order-model");
+const { customerModel } = require("../models/customers-model");
+const { custPaymentModel } = require("../models/customer-payments-model");
+const { custPaymentValidation } = require("../validations/cust-payment-validation");
+const moment=require("moment")
 
 
 const getAll = async (req, res) => {
   try {
-    const data = await orderModel.find().populate({
-      path: "food",
-      model: "foods",
-      select: "name status _id",
+    const data = await custPaymentModel.find().populate({
+      path: "customerId",
+      model: "customer",
+      select: "customerName TotalAmount _id",
     });
     res.status(200).send(data);
   } catch (error) {
@@ -20,7 +20,7 @@ const getAll = async (req, res) => {
 const getById = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await orderModel.findById(id);
+    const data = await custPaymentModel.findById(id);
     res.status(200).send(data);
   } catch (error) {
     res.status(404).send(error.message);
@@ -31,22 +31,36 @@ const Post = async (req, res) => {
   const SESSION = await db.startSession();
   await SESSION.startTransaction();
   try {
-    
-    const cartData=await cartModel.find()
-    if(!cartData) {
-      res.send({status:false,message:"can't order empty cart"})
+    const {error}=custPaymentValidation(req.body)
+    if(error){
       await SESSION.abortTransaction();
+      return res.status(400).json(error.message)
     } 
 
-const postData=await orderModel.insertMany(cartData).then(async() =>{
+
+const postData=new custPaymentModel(req.body)
+const getCustomer=await customerModel.findById(req.body.customerId)
+
+if(!getCustomer){
+  await SESSION.abortTransaction();
+
+ return res.status(200).send({status: false,message: "not found !!", });
+}
+let currAmount=parseFloat(getCustomer.TotalAmount)-parseFloat(req.body.Amount)
+
+
+await postData.save().then(async() =>{
+    await customerModel.findByIdAndUpdate(getCustomer._id,{
+        TotalAmount:currAmount
+    })
   await SESSION.commitTransaction();
   res.status(201).send({
     status: true,
-    message: "ordered!!",
+    message: "Done!!",
     
   
   });
-  await cartModel.deleteMany()
+
 })
   } catch (error) {
     res.status(404).send(error.message);
@@ -61,9 +75,9 @@ const Put = async (req, res) => {
   await SESSION.startTransaction();
   try {
     const { id } = req.params;
-    // const {error}=foodValidation(req.body)
-    // if(error) return res.status(400).json(error.message)
-    const PutData = await orderModel.findByIdAndUpdate(id, req.body, {
+    const {error}=custPaymentValidation(req.body)
+    if(error) return res.status(400).json(error.message)
+    const PutData = await custPaymentModel.findByIdAndUpdate(id, req.body, {
       new: true,
     });
     
@@ -79,7 +93,7 @@ const Put = async (req, res) => {
 const Delete = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await orderModel.findByIdAndDelete(id);
+    const data = await custPaymentModel.findByIdAndDelete(id);
     res.status(201).json({
       status: true,
       message: "deleted!!",
@@ -89,25 +103,13 @@ const Delete = async (req, res) => {
     res.status(404).send(error.message);
   }
 };
-const getByCat = async (req, res) => {
-  try {
-    const { id } = req.params;
 
-    const foodCat = await foodCategoryModel.findById(id);
-
-    const getData = await foodModel.find({ category: foodCat._id,status:"active" });
-
-    
-    res.status(200).send({ getData });
-  } catch (error) {
-    res.status(404).send(error.message);
-  }
-};
 module.exports = {
   getAll,
   getById,
   Post,
   Put,
   Delete,
-  getByCat,
+
+
 };
