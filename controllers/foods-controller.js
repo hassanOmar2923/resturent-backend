@@ -1,7 +1,7 @@
 const { foodCategoryModel } = require("../models/foodCategory-model")
 const { foodModel } = require("../models/foods-model")
 const { foodValidation } = require("../validations/foods-validations")
-
+const cloudinary=require("../helpers/cloudinary")
 const getAll=async(req,res)=>{
     try {
         const data=await foodModel.find().populate({
@@ -29,13 +29,14 @@ const getById=async(req,res)=>{
 const Post=async(req,res)=>{
     try {
         // const {error}=foodValidation(req.body)
-        // if(error) res.status(400).send(error.message)
+        // if(error) return res.status(400).send(error.message)
         const postData=await foodModel.insertMany(req.body.friends)
+        // console.log(req.body.friends)
 
         res.status(201).send({
             status:true,
             message:'created!!',
-            postData
+            // postData
         
            
         })
@@ -52,7 +53,7 @@ const Put=async(req,res)=>{
         const {id}=req.params
         const {error}=foodValidation(req.body)
 
-        if(error) res.status(400).json(error.message)
+        if(error) return res.status(400).json(error.message)
         const PutData=await foodModel.findByIdAndUpdate(id,req.body,{new:true})
         // const allfoods=await foodModel.find({category:req.body.category})
         
@@ -122,6 +123,36 @@ const getActiveFood = async (req, res) => {
       res.status(404).send(error.message);
     }
   };
+  const addImg=async(req,res)=>{
+    try {
+        const {id}=req.params
+        const image=req.body.image
+        const result = await cloudinary.uploader.upload(image, {
+            folder: "products",
+            // width: 300,
+            // crop: "scale"
+        })
+        const PutData=await foodModel.findByIdAndUpdate(id,{
+            image: {
+                public_id: result.public_id,
+                url: result.secure_url
+            },
+        },{new:true})
+       
+        // const uppdateQty=await foodCategoryModel.findByIdAndUpdate(req.body.category,{
+        //     Quantity:allQty
+        // },{new:true})
+        res.status(200).send({
+            status:true,
+            message:'updated!!',
+            PutData
+        })
+    } catch (error) {
+        res.status(404).send(error.message)
+    }
+    
+   
+} 
 module.exports={
     getAll,
     getById,
@@ -129,5 +160,6 @@ module.exports={
     Put,
     Delete,
     updateStatus,
-    getActiveFood
+    getActiveFood,
+    addImg
 }

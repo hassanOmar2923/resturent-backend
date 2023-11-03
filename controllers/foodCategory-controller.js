@@ -24,7 +24,7 @@ const getById=async(req,res)=>{
 const Post=async(req,res)=>{
     try {
         const {error}=foodCategoryValidation(req.body)
-        if(error) res.status(400).json(error.message)
+        if(error) return res.status(400).json(error.message)
         const postData=new foodCategoryModel(req.body)
         await postData.save()
         res.status(201).json({
@@ -43,7 +43,7 @@ const Put=async(req,res)=>{
     try {
         const {id}=req.params
         const {error}=foodCategoryValidation(req.body)
-        if(error) res.status(400).json(error.message)
+        if(error) return res.status(400).json(error.message)
         const PutData=foodCategoryModel.findByIdAndUpdate(id,req.body,{new:true})
         
         res.status(200).json({

@@ -10,6 +10,8 @@ function cartValidation(body){
         price:joi.number().required(),
         food:joi.string().required(),
         name:joi.string(),
+        Date:joi.string(),
+      
     })
     return val.validate(body)
 }
