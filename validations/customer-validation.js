@@ -5,6 +5,7 @@ function custValidator(outmval) {
     customerName: joi.string().required(),
     TotalAmount: joi.number(),
     number: joi.number().required(),
+    email:joi.string().email({ tlds: { allow: false } }),
   });
   return outval.validate(outmval);
 }

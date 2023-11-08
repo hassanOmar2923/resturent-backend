@@ -50,7 +50,7 @@ const Put=async(req,res)=>{
         const {id}=req.params
         const {error}=custValidator(req.body)
 
-        if(error) res.status(400).json(error.message)
+        if(error) return res.status(400).json(error.message)
         const PutData=await customerModel.findByIdAndUpdate(id,req.body,{new:true})
       
         res.status(200).send({
