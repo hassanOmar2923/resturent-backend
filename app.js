@@ -3,6 +3,8 @@ const { mongoDB } = require('./helpers/DBconnection');
 const app = express();
 require('dotenv').config();
 const cors = require('cors');
+
+
 // routes exported
 const userRouter = require('./routes/users-route');
 const StoreItemRouter = require('./routes/StoreItemRouter');
@@ -19,6 +21,9 @@ const userRoute=require('./routes/users-route');
 const customerRoute=require('./routes/customer-route');
 const custTransectionRoute=require('./routes/custTransection-route');
 const custPaymentRoute=require('./routes/cust-payment-route');
+const verifyCustomerRoute=require('./routes/verifyCustomer-route');
+const employeeRoute=require('./routes/employee-route');
+const employeeUsersRoute=require('./routes/employeeUsers-route');
 const { Authentication } = require('./middlewares/Auth');
 app.use(express.json());
 app.use(cors());
@@ -46,6 +51,9 @@ app.use('/foodCat',foodCategoryRoute)
 app.use('/customers',customerRoute)
 app.use('/custTransection',custTransectionRoute)
 app.use('/custPayment',custPaymentRoute)
+app.use('/verifyCustomer',verifyCustomerRoute)
+app.use('/employee',employeeRoute)
+app.use('/employeeUser',employeeUsersRoute)
 app.listen(process.env.PORT,()=>{
     console.log(`listining on Port ${process.env.PORT}`);
 });
