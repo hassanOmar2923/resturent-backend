@@ -102,7 +102,7 @@ const getBySelection=async(req,res)=>{
             })
         }
         let TotalDeyn=0
-        if(payment){
+        if(deyman){
             deyman.forEach((item)=>{
                 TotalDeyn+=item.Amount
           })

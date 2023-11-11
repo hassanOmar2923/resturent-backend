@@ -173,7 +173,7 @@ const verify = async (req, res) => {
     const findOTPcode = await verifyCustomerModel.find({
       email: findcustomer[0].email,
     }).sort({"createdAt":-1}).limit(1)
-    console.log('validotp',findOTPcode);
+    // console.log('validotp',findOTPcode);
     if (findOTPcode.length === 0)
       return res
         .status(404)
@@ -187,8 +187,8 @@ const verify = async (req, res) => {
       return false;
     }
     const isValidcode = compareCode(findOTPcode[0].OTPcode, req.body.OTPcode);
-    console.log(findOTPcode[0].OTPcode, req.body.code)
-    console.log(isValidcode);
+    // console.log(findOTPcode[0].OTPcode, req.body.code)
+    // console.log(isValidcode);
     if (!isValidcode)
       return res.status(404).send({ status: false, message: "invalid code" });
     const token = jwt.sign(
