@@ -32,9 +32,9 @@ const Post = async (req, res) => {
     const { error } = employeeUserValidator(req.body);
     if (error) return res.status(400).send(error.message);
     const findEmployee = await employeeUsersModel.find({employeeId:req.body.employeeId})
-    if(findEmployee.length >0) return res.send({status: false,message: 'this user has been already a pin',});
+    if(findEmployee.length >0) return res.status(208).send({status: false,message: 'this user has been already a pin',});
     const isPinUsed = await employeeUsersModel.find({pin:req.body.pin})
-    if(isPinUsed.length >0) return res.send({status: false,message: 'this pin has already used',});
+    if(isPinUsed.length >0) return res.status(208).send({status: false,message: 'this pin has already used',});
     const Post = await employeeUsersModel(req.body);
     await Post.save();
     res.status(200).send({
@@ -54,6 +54,7 @@ const verify = async (req, res) => {
     //   console.log(isValid[0].employeeId)
       req.body.employeeId = isValid[0].employeeId
       const employee = await employeeModel.findById(isValid[0].employeeId);
+      if(isValid[0].status === "pending") return res.status(401).send({status: false, message:'this user is already pending,pls contact the administrator'})
 
     const token = jwt.sign(
         {
@@ -103,6 +104,26 @@ const Delete = async (req, res) => {
     res.status(404).send(error.message);
   }
 };
+const updateStatus = async (req, res) => {
+  try {
+    const {id}=req.params
+  
+  
+    
+  //put data
+
+  const putdate =await employeeUsersModel.findByIdAndUpdate(id,{status:req.body.status},{new:true});
+    res.status(200).send({
+      status:true,
+      message:'successfuly Updated',
+      data:putdate
+
+  });
+   
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
 
 module.exports = {
   Get,
@@ -110,5 +131,6 @@ module.exports = {
   Post,
   Put,
   Delete,
-  verify
+  verify,
+  updateStatus
 };
