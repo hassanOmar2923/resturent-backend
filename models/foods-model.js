@@ -19,11 +19,11 @@ price:{
 image: {
     public_id: {
         type: String,
-        required: true
+        // required: true
     },
     url: {
         type: String,
-        required: true
+        // required: true
     }
 
 },
@@ -32,7 +32,8 @@ status:{
     default:'active',
     enum:['active', 'inactive']
     // required:true
-}
+},
+
 },{timestamps:true})
 
 const foodModel=mongoose.model('foods',schema)

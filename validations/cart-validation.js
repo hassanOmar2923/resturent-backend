@@ -11,6 +11,8 @@ function cartValidation(body){
         food:joi.string().required(),
         name:joi.string(),
         Date:joi.string(),
+        userName:joi.string().required(),
+        userID:joi.string().required(),
       
     })
     return val.validate(body)

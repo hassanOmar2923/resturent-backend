@@ -26,6 +26,10 @@ const employeeRoute=require('./routes/employee-route');
 const employeeUsersRoute=require('./routes/employeeUsers-route');
 const { Authentication } = require('./middlewares/Auth');
 app.use(express.json());
+// const bodyParser = require('body-parser');
+
+// app.use(bodyParser.urlencoded({ parameterLimit: 10000 }));
+
 app.use(cors());
 require('dotenv').config()
 mongoDB();

@@ -52,24 +52,13 @@ const Put=async(req,res)=>{
     try {
         const {id}=req.params
         const {error}=foodValidation(req.body)
-
         if(error) return res.status(400).json(error.message)
+       
         const PutData=await foodModel.findByIdAndUpdate(id,req.body,{new:true})
-        // const allfoods=await foodModel.find({category:req.body.category})
-        
-        // let allQty=0;
-        // allfoods.forEach((food)=>{
-        //     allQty=parseInt(allQty)+parseInt(food.Qty)
-        
-
-        // })
-        // const uppdateQty=await foodCategoryModel.findByIdAndUpdate(req.body.category,{
-        //     Quantity:allQty
-        // },{new:true})
         res.status(200).send({
             status:true,
             message:'updated!!',
-            PutData
+            Get
         })
     } catch (error) {
         res.status(404).send(error.message)
@@ -81,12 +70,19 @@ const Put=async(req,res)=>{
 const Delete=async(req,res)=>{
     try {
         const {id}=req.params
-    const data=await foodModel.findByIdAndDelete(id)
+        const get=await foodModel.findById(id)
+        const data=await foodModel.findByIdAndDelete(id)
+    const imgId = get?.image?.public_id;
+    if (imgId) {
+        await cloudinary.uploader.destroy(imgId);
+    }
     res.status(201).json({
         status:true,
         message:'deleted!!',
-        data
+        // data,
+        get
     })
+
     } catch (error) {
         res.status(404).send(error.message)
     }
@@ -126,26 +122,21 @@ const getActiveFood = async (req, res) => {
   const addImg=async(req,res)=>{
     try {
         const {id}=req.params
-        const image=req.body.image
-        const result = await cloudinary.uploader.upload(image, {
-            folder: "products",
-            // width: 300,
-            // crop: "scale"
-        })
+        const Get=await foodModel.findById(req.params.id)
+    // console.log("Get",Get.image.public_id.length)
+    // if (Get.image.public_id.length>0) {
+    //     const imgId = Get?.image?.public_id;
+    //     await cloudinary.uploader.destroy(imgId);
+    // }
         const PutData=await foodModel.findByIdAndUpdate(id,{
-            image: {
-                public_id: result.public_id,
-                url: result.secure_url
-            },
+            image:req.body.image,
         },{new:true})
-       
-        // const uppdateQty=await foodCategoryModel.findByIdAndUpdate(req.body.category,{
-        //     Quantity:allQty
-        // },{new:true})
+    //    console.log(req.body)
+
         res.status(200).send({
             status:true,
             message:'updated!!',
-            PutData
+            // PutData
         })
     } catch (error) {
         res.status(404).send(error.message)

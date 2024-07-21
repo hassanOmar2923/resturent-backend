@@ -120,6 +120,11 @@ const ordersById = async (req, res) => {
     // yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     const data = await orderModel.aggregate([
       {
+        $match: {
+          status: "paid",
+        },
+      },
+      {
         $group: {
           _id: "$orderId",
           total: { $sum: "$totalAmount" },
