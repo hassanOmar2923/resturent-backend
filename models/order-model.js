@@ -35,7 +35,14 @@ Date:{
     type: String,
     // default:Date.now()
 },
-
+userID:{
+    type:String,
+    default:0
+},
+userName:{
+    type:String,
+    default:0
+},
 },{timestamps:true})
 
 const orderModel=mongoose.model('order',schema)
